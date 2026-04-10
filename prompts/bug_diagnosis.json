@@ -1,0 +1,31 @@
+{
+  "crash_diagnosis": {
+    "name": "游戏崩溃诊断",
+    "description": "分析崩溃日志并给出修复方案",
+    "prompt": "游戏在以下情况下崩溃：\n- 场景切换时随机 Crash\n- 错误日志：Access Violation / NullReferenceException\n- 崩溃频率约 5-10%（非必现）\n\n请分析可能的原因，给出排查步骤和修复方案。请分步骤说明。"
+  },
+
+  "performance_issue": {
+    "name": "性能问题分析",
+    "description": "分析游戏帧率下降的原因",
+    "prompt": "游戏在特定场景帧率从 60fps 降到 20fps。Profiler 数据：\n- CPU Main Thread: 35ms\n- GPU: 12ms\n- GC Alloc: 每帧 1.8MB\n- 场景内有 150 个动态 GameObject\n\n请分析可能原因并给出优化方案，按优先级排序。"
+  },
+
+  "memory_leak": {
+    "name": "内存泄漏排查",
+    "description": "排查游戏运行中的内存泄漏",
+    "prompt": "游戏运行 30 分钟后内存从 2GB 增长到 4.5GB。现象：\n- 内存持续增长，不回落\n- 切换场景也不能释放\n- 最终导致 OOM Crash\n\n请给出排查步骤和常见内存泄漏场景的解决方案。"
+  },
+
+  "network_desync": {
+    "name": "网络不同步问题",
+    "description": "分析多人游戏中的位置不同步",
+    "prompt": "多人游戏中，玩家 A 看到玩家 B 的位置与玩家 B 自己的位置不一致。现象：\n- 延迟约 100-200ms\n- 移动时出现'瞬移'\n- 攻击判定偶尔不命中\n\n请分析原因并给出解决方案，包括客户端预测和服务器端校验。"
+  },
+
+  "shader_error": {
+    "name": "Shader 编译错误",
+    "description": "分析 Shader 编译或渲染异常",
+    "prompt": "自定义 Shader 在编辑器中正常，但打包后在某些设备上渲染异常：\n- 材质变成紫黑色\n- 部分平台正常，部分平台异常\n- 日志显示 Shader variant 编译警告\n\n请分析原因并给出解决方案。"
+  }
+}
