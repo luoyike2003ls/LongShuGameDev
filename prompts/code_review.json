@@ -1,0 +1,22 @@
+{
+  "ue_code_review": {
+    "name": "UE C++ 代码审查",
+    "description": "审查 UE C++ 代码的质量和最佳实践",
+    "system_prompt": "你是 REAP 多智能体协作网络的代码审查专家。请审查以下代码并指出问题。",
+    "prompt": "请审查以下 UE C++ 代码，指出潜在问题并给出改进建议：\n\n```cpp\nUCLASS()\nclass UWeaponComponent : public UActorComponent\n{\n    GENERATED_BODY()\npublic:\n    AActor* Target;\n    TArray<ABullet*> ActiveBullets;\n\n    void Fire()\n    {\n        ABullet* Bullet = GetWorld()->SpawnActor<ABullet>(BulletClass);\n        Bullet->SetOwner(GetOwner());\n        ActiveBullets.Add(Bullet);\n    }\n\n    void ClearBullets()\n    {\n        for (auto* B : ActiveBullets)\n        {\n            B->Destroy();\n        }\n    }\n};\n```\n\n请从以下维度审查：\n1. 内存安全（GC、悬空指针）\n2. 网络同步\n3. 性能\n4. 代码规范"
+  },
+
+  "unity_code_review": {
+    "name": "Unity C# 代码审查",
+    "description": "审查 Unity C# 代码的质量和最佳实践",
+    "system_prompt": "你是 REAP 多智能体协作网络的代码审查专家。",
+    "prompt": "请审查以下 Unity C# 代码：\n\n```csharp\npublic class EnemySpawner : MonoBehaviour\n{\n    public GameObject enemyPrefab;\n    private List<GameObject> spawnedEnemies = new List<GameObject>();\n\n    void Update()\n    {\n        if (Input.GetKeyDown(KeyCode.Space))\n        {\n            SpawnEnemy();\n        }\n    }\n\n    void SpawnEnemy()\n    {\n        GameObject enemy = Instantiate(enemyPrefab);\n        spawnedEnemies.Add(enemy);\n    }\n\n    public void ClearAll()\n    {\n        foreach (var e in spawnedEnemies)\n        {\n            Destroy(e);\n        }\n    }\n}\n```\n\n请从以下维度审查：\n1. 性能（GC、DrawCall、更新循环）\n2. 内存管理\n3. 架构设计\n4. 最佳实践"
+  },
+
+  "lua_code_review": {
+    "name": "Lua 热更代码审查",
+    "description": "审查 Lua 热更新脚本的质量",
+    "system_prompt": "你是 REAP 多智能体协作网络的代码审查专家。",
+    "prompt": "请审查以下 Lua 热更代码：\n\n```lua\nlocal BattleManager = {}\n\nfunction BattleManager:StartBattle(config)\n    self.enemies = {}\n    for i = 1, config.enemyCount do\n        local enemy = CreateEnemy(config.enemyType)\n        table.insert(self.enemies, enemy)\n    end\n    self.isRunning = true\nend\n\nfunction BattleManager:Update(dt)\n    if not self.isRunning then return end\n    for _, enemy in ipairs(self.enemies) do\n        enemy:Update(dt)\n        if enemy:IsDead() then\n            table.remove(self.enemies, _)\n        end\n    end\nend\n\nreturn BattleManager\n```\n\n请从以下维度审查：\n1. 迭代中修改表的安全性\n2. 内存泄漏\n3. 性能\n4. 代码结构"
+  }
+}
