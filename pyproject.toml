@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "longshu-gamedev"
+version = "1.0.1"
+description = "A Game Development Large Language Model Architecture & Orchestration Suite"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "luoyike2003ls"}
+]
+keywords = [
+    "game-development",
+    "gamedev",
+    "large-language-model",
+    "llm",
+    "moe",
+    "quantization",
+    "unity",
+    "unreal-engine"
+]
+dependencies = [
+    "numpy>=1.24.0",
+    "pydantic>=2.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "ruff>=0.1.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/luoyike2003ls/LongShuGameDev"
+"HuggingFace Model" = "https://huggingface.co/luoyike2003/LongShuGameDev-Qwen3.5-122B-REAP-Architect-MLX-4bit"
