@@ -1,0 +1,11 @@
+# Core Inference & Math
+numpy>=1.24.0
+pydantic>=2.0.0
+
+# Testing & Quality
+pytest>=7.4.0
+
+# LLM Runtime (optional for mock, required for full inference)
+# For Apple Silicon Metal support, install with:
+# CMAKE_ARGS="-DGGML_METAL=on" pip install llama-cpp-python
+llama-cpp-python>=0.2.70; sys_platform != "win32"
