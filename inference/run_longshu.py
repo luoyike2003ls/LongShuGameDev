@@ -8,6 +8,9 @@ Usage:
         --prompt "帮我设计一个ARPG游戏的技能系统" \
         --max-tokens 2048
 
+Mock Mode (No GPU / Model weights required):
+    python run_longshu.py --mock --prompt "帮我设计一个ARPG技能系统"
+
 Requirements:
     pip install llama-cpp-python
 """
@@ -17,13 +20,6 @@ import json
 import sys
 import time
 from pathlib import Path
-
-try:
-    from llama_cpp import Llama
-except ImportError:
-    print("Error: llama-cpp-python is required.")
-    print("Install with: pip install llama-cpp-python")
-    sys.exit(1)
 
 
 # ============================================================
@@ -66,8 +62,82 @@ def load_prompt_file(prompt_file: str, template_name: str = None) -> str:
     return templates[first_key].get('prompt', '')
 
 
+def run_mock_inference(user_input: str):
+    """Simulated inference for testing and demonstration without GPU."""
+    print("🐉 [MOCK MODE] Simulating LongShu TD Architect Dispatch...")
+    print(f"📥 Input prompt: {user_input}\n")
+    print("🧠 Decomposing game systems into multi-agent contracts...\n")
+    print("-" * 60)
+
+    mock_plan = {
+        "plan_id": "LONGSHU-DISPATCH-DEMO-2026",
+        "commander": "TIANCE (天策)",
+        "analysis": f"Deconstructed request '{user_input}'. Splitting into decoupled engine subsystems, data tables, and RPC interfaces.",
+        "openclaw_dispatch": [
+            {
+                "task_id": "T01-CORE-LOGIC",
+                "agent_role": "Logic-Forge",
+                "description": "Derive from UGameplayAbility/UBuffBase with deterministic tick lifecycle.",
+                "interface_contract": "void InitializeSubsystem(AActor* Instigator, float BudgetMs = 0.5f)",
+                "dependency": []
+            },
+            {
+                "task_id": "T02-DATA-CONFIG",
+                "agent_role": "Data-Forge",
+                "description": "Construct DataTable schema with strict memory alignment and hot-reload support.",
+                "interface_contract": "CSV_Row_Insert / FGameplayDataTableRow",
+                "dependency": []
+            },
+            {
+                "task_id": "T03-PERF-AUDIT",
+                "agent_role": "Perf-Auditor",
+                "description": "Frame time analysis and cache hit verification under 16.6ms target.",
+                "interface_contract": "PROFILE_FRAME(SubsystemName)",
+                "dependency": ["T01-CORE-LOGIC"]
+            }
+        ],
+        "verification_metrics": {
+            "target_framerate": "60 FPS (16.6ms frame budget)",
+            "gc_alloc_per_tick": "0 bytes",
+            "thread_safety": "GameThread only with async task offloading"
+        }
+    }
+
+    formatted = json.dumps(mock_plan, indent=2, ensure_ascii=False)
+    for line in formatted.splitlines():
+        time.sleep(0.02)
+        print(line)
+
+    print("\n" + "-" * 60)
+    print("📊 [MOCK STATS] 285 tokens generated in 0.8s (356.2 tokens/s simulated)")
+    print("✅ Mock execution verified successfully.")
+
+
 def run_inference(args):
     """Main inference loop."""
+    if args.prompt_file:
+        user_input = load_prompt_file(args.prompt_file, args.template)
+    elif args.prompt:
+        user_input = args.prompt
+    else:
+        user_input = "帮我设计一个MMO游戏的背包与掉落物系统"
+
+    if args.mock:
+        run_mock_inference(user_input)
+        return
+
+    try:
+        from llama_cpp import Llama
+    except ImportError:
+        print("Error: llama-cpp-python is required for real model execution.")
+        print("Install with: pip install llama-cpp-python")
+        print("Or use mock mode for testing: python run_longshu.py --mock")
+        sys.exit(1)
+
+    if not args.model_path:
+        print("Error: --model-path is required when not in --mock mode.")
+        sys.exit(1)
+
     model_path = Path(args.model_path)
     if not model_path.exists():
         print(f"Error: Model not found at {model_path}")
@@ -78,7 +148,6 @@ def run_inference(args):
 
     load_start = time.time()
 
-    # Build llama-cpp parameters
     llama_params = {
         'model_path': str(model_path),
         'n_ctx': args.n_ctx,
@@ -97,20 +166,6 @@ def run_inference(args):
     load_time = time.time() - load_start
     print(f"✅ Model loaded in {load_time:.1f}s\n")
 
-    # Build prompt
-    if args.prompt_file:
-        user_input = load_prompt_file(args.prompt_file, args.template)
-    elif args.prompt:
-        user_input = args.prompt
-    else:
-        # Interactive mode
-        print("🎮 LongShu Commander Mode — Interactive")
-        print("   Type 'quit' or 'exit' to stop.\n")
-        user_input = input("你: ")
-        if not user_input:
-            return
-
-    # Chat mode: use the chat template
     messages = [
         {"role": "system", "content": COMMANDER_SYSTEM_PROMPT},
         {"role": "user", "content": user_input},
@@ -122,7 +177,6 @@ def run_inference(args):
     gen_start = time.time()
     token_count = 0
 
-    # Use chat completion API
     output = llm.create_chat_completion(
         messages=messages,
         max_tokens=args.max_tokens,
@@ -148,45 +202,6 @@ def run_inference(args):
     print(f"\n📊 Stats: {token_count} tokens in {gen_time:.1f}s ({speed:.1f} tokens/s)")
     print(f"🧠 Total time: {load_time + gen_time:.1f}s (load: {load_time:.1f}s, gen: {gen_time:.1f}s)")
 
-    # Interactive mode continuation
-    if args.prompt_file is None and args.prompt is None:
-        print("\n💡 Type your next prompt (or 'quit' to exit):")
-        while True:
-            user_input = input("\n你: ")
-            if user_input.lower() in ('quit', 'exit', 'q'):
-                break
-            messages.append({"role": "assistant", "content": full_response})
-            messages.append({"role": "user", "content": user_input})
-
-            print("\n🧠 Generating...\n")
-            print("-" * 60)
-
-            full_response = ""
-            token_count = 0
-            gen_start = time.time()
-
-            output = llm.create_chat_completion(
-                messages=messages,
-                max_tokens=args.max_tokens,
-                temperature=args.temperature,
-                top_p=args.top_p,
-                repeat_penalty=args.repeat_penalty,
-                stream=True,
-            )
-
-            for chunk in output:
-                delta = chunk['choices'][0]['delta']
-                if 'content' in delta and delta['content'] is not None:
-                    content = delta['content']
-                    print(content, end='', flush=True)
-                    full_response += content
-                    token_count += 1
-
-            gen_time = time.time() - gen_start
-            speed = token_count / gen_time if gen_time > 0 else 0
-            print(f"\n{'-' * 60}")
-            print(f"📊 {token_count} tokens in {gen_time:.1f}s ({speed:.1f} t/s)")
-
 
 def main():
     parser = argparse.ArgumentParser(
@@ -194,7 +209,10 @@ def main():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  # Quick question
+  # Mock dry-run (No GPU or model file needed)
+  python run_longshu.py --mock --prompt "帮我设计一个MMO背包系统"
+
+  # Quick question on real model
   python run_longshu.py --model-path ./model.gguf \\
       --prompt "UE5 中如何实现角色移动的根运动？"
 
@@ -202,14 +220,13 @@ Examples:
   python run_longshu.py --model-path ./model.gguf \\
       --prompt-file prompts/architecture_design.json \\
       --template "inventory_system"
-
-  # Interactive mode
-  python run_longshu.py --model-path ./model.gguf
         """
     )
 
-    parser.add_argument('--model-path', type=str, required=True,
+    parser.add_argument('--model-path', type=str, default=None,
                         help='Path to the GGUF model file')
+    parser.add_argument('--mock', action='store_true',
+                        help='Run in simulated mock mode without downloading model weights')
     parser.add_argument('--prompt', type=str, default=None,
                         help='Input prompt text')
     parser.add_argument('--prompt-file', type=str, default=None,
