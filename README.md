@@ -1,27 +1,45 @@
 # 🐉 LongShu (龙枢) — Game Development Large Language Model
 
 <p align="center">
-  <strong>专为游戏研发打造的 AI 指挥官</strong>
+  <strong>专为游戏研发打造的 AI 指挥官 / Game Development Large Language Model</strong>
 </p>
 
 <p align="center">
+  <a href="https://github.com/luoyike2003ls/LongShuGameDev/actions/workflows/ci.yml"><img src="https://github.com/luoyike2003ls/LongShuGameDev/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="https://huggingface.co/luoyike2003/LongShuGameDev-Qwen3.5-122B-REAP-Architect-MLX-4bit"><img src="https://img.shields.io/badge/🤗-HuggingFace-yellow" alt="HuggingFace"></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.10%2B-blue.svg" alt="Python"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue" alt="License"></a>
   <a href="#benchmark"><img src="https://img.shields.io/badge/Game--SWE--Bench-v1.0-green" alt="Benchmark"></a>
 </p>
 
 ---
 
-## Quick Start
+## ⚡ Quick Start / 快速上手
+
+### 0. 免显卡即时体验 (Mock Demo)
+
+无需下载任何数十 GB 权重，无需显卡，直接在终端体验龙枢技术总监（TIANCE）的任务拆解与多智能体调度：
+
+```bash
+# 克隆仓库
+git clone https://github.com/luoyike2003ls/LongShuGameDev.git
+cd LongShuGameDev
+
+# 一秒运行模拟调度
+python inference/run_longshu.py --mock --prompt "帮我设计一个MMO游戏的背包与掉落物系统"
+```
+
+### 1. 生产环境模型部署 (Real Inference)
 
 ```bash
 # 安装依赖
-pip install llama-cpp-python
+pip install -r requirements.txt
 
-# 下载模型（HuggingFace）
+# 下载模型（HuggingFace 4-bit MLX/GGUF）
 # https://huggingface.co/luoyike2003/LongShuGameDev-Qwen3.5-122B-REAP-Architect-MLX-4bit
+huggingface-cli download luoyike2003/LongShuGameDev-Qwen3.5-122B-REAP-Architect-MLX-4bit --local-dir ./LongShuGameDev-MLX-4bit
 
-# 一键运行
+# 一键运行真实推理
 python inference/run_longshu.py --model-path ./LongShuGameDev-MLX-4bit \
     --prompt "帮我设计一个ARPG游戏的技能系统架构"
 ```
@@ -54,49 +72,6 @@ python inference/run_longshu.py --model-path ./LongShuGameDev-MLX-4bit \
 | 核心源码 | 20亿+ Token | UE C++、Unity C#、Godot、Lua 热更 |
 | 工程文档 | 30万+ 页 | GDD、系统拆解、数值策划逻辑 |
 | 线上高质量数据 | 100亿+ | StackOverflow gamedev、GitHub Issues、图形学论文 |
-
----
-
-## 快速上手
-
-### 1. 安装依赖
-
-```bash
-pip install llama-cpp-python numpy
-```
-
-### 2. 下载模型
-
-```bash
-# 从 HuggingFace 下载 4bit MLX 量化版本
-# 推荐使用 huggingface-cli
-huggingface-cli download luoyike2003/LongShuGameDev-Qwen3.5-122B-REAP-Architect-MLX-4bit --local-dir ./LongShuGameDev-MLX-4bit
-```
-
-### 3. 运行推理
-
-```bash
-python inference/run_longshu.py \
-    --model-path ./LongShuGameDev-MLX-4bit \
-    --prompt "帮我设计一个MMO游戏的背包系统" \
-    --max-tokens 2048
-```
-
-### 4. Docker 一键部署
-
-```bash
-docker build -t longshu:latest .
-docker run -it --gpus all -v ./models:/models longshu:latest \
-    python inference/run_longshu.py --model-path /models/LongShuGameDev-MLX-4bit
-```
-
-### 性能调优参数
-
-| 硬件 | 推荐参数 |
-|------|----------|
-| Mac M4 Pro 64GB | `--n-gpu-layers -1 --threads 10 --batch-size 512` |
-| 双 RTX 4090 | `--n-gpu-layers 60 --tensor-split 1,1 --batch-size 1024` |
-| 单 RTX 4090 24GB | `--n-gpu-layers 30 --tensor-split 1 --batch-size 256` |
 
 ---
 
@@ -153,16 +128,19 @@ python inference/run_longshu.py \
 ## 仓库结构
 
 ```
-longshu/
+LongShuGameDev/
+├── .github/workflows/  # GitHub Actions CI 流水线
 ├── inference/          # 推理脚本 & 部署工具
 ├── benchmark/          # Game-SWE-Bench 基准测试
 ├── prompts/            # 游戏开发专用 Prompt 库
-├── tutorials/          # Jupyter Notebook 教程
-├── tools/              # 量化/压缩工具链
-├── examples/           # 实战案例
-├── docs/               # 文档
-├── TECHNICAL_REPORT.md # 技术报告
-└── Dockerfile          # Docker 部署
+├── tools/              # 游戏感知混合量化工具链
+├── examples/           # 实战案例（ARPG中毒状态等）
+├── tests/              # 自动化测试用例
+├── docs/               # 部署与调优文档
+├── pyproject.toml      # 现代 Python 打包标准
+├── requirements.txt    # 依赖说明
+├── TECHNICAL_REPORT.md # 完整学术/工程技术报告
+└── Dockerfile          # 容器化部署
 ```
 
 ---
